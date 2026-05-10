@@ -39,10 +39,16 @@ calls — that is the next step.
 
 ## Build
 
-Requires CUDA toolkit (nvcc) with `sm_120` target and a checked-out forge
-repo at `/home/garrick/forge` (path is hard-coded in `build.rs` for now).
+Requires CUDA toolkit 12+ (`nvcc` on PATH) targeting `sm_120` (RTX 5090
+/ Blackwell). For sm_89 (RTX 4090 / Ada) change the `-arch=sm_120` flag
+in `build.rs`. Rust 1.85+ stable.
 
-```
+The kernel `vendor/forge_2009_*.cu` is vendored from
+[garrick247/forge](https://github.com/garrick247/forge) at commit
+`4a13f03` (PR #17, where the verified factored Poseidon2 demo landed) —
+no separate forge checkout is required to build this crate.
+
+```bash
 cargo test  --release      # KAT + 1024-perm batch byte-id vs Plonky3
 cargo bench --bench perm_throughput
 ```

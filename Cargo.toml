@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-p3-baby-bear = { path = "/home/garrick/Plonky3/baby-bear" }
-p3-field    = { path = "/home/garrick/Plonky3/field" }
-p3-symmetric = { path = "/home/garrick/Plonky3/symmetric" }
+p3-baby-bear = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-field    = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-symmetric = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
 
 [dev-dependencies]
 rand = "0.8"

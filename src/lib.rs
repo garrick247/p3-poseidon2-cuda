@@ -52,6 +52,7 @@ pub fn permute_batch(state: &[BabyBear], out: &mut [BabyBear]) {
 mod tests {
     use super::*;
     use p3_baby_bear::default_babybear_poseidon2_16;
+    use p3_field::PrimeCharacteristicRing;
     use p3_symmetric::Permutation;
 
     /// Plonky3's published BB-16 test vector (matches the same vector

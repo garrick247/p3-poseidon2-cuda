@@ -1,17 +1,17 @@
 //! Build the FORGE-emitted, FORGE-verified BB-16 Poseidon2 perm kernel
 //! (demos/2009_*.cu) into a static lib that this crate then links.
 //!
-//! The .cu lives in the forge repo at:
-//!   /home/garrick/forge/demos/2009_bench_baby_bear_fused_perm_factored.cu
-//!
-//! It contains a demo `main` we silently rename via -Dmain=_forge_demo_main_unused.
+//! The .cu is vendored at vendor/forge_2009_bench_baby_bear_fused_perm_factored.cu
+//! (originally generated from forge demos/2009_*.fg by FORGE/Z3 at commit
+//! 4a13f03 of garrick247/forge). It contains a demo `main` that we
+//! silently rename via -Dmain=_forge_demo_main_2009.
 
 use std::process::Command;
 use std::path::{Path, PathBuf};
 
 fn main() {
     let forge_cu = Path::new(
-        "/home/garrick/forge/demos/2009_bench_baby_bear_fused_perm_factored.cu"
+        "vendor/forge_2009_bench_baby_bear_fused_perm_factored.cu"
     );
     let glue_cu = Path::new("src/glue.cu");
     println!("cargo:rerun-if-changed={}", forge_cu.display());

@@ -1,0 +1,24 @@
+[package]
+name = "p3-poseidon2-cuda"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+p3-baby-bear = { path = "/home/garrick/Plonky3/baby-bear" }
+p3-field    = { path = "/home/garrick/Plonky3/field" }
+p3-symmetric = { path = "/home/garrick/Plonky3/symmetric" }
+
+[dev-dependencies]
+rand = "0.8"
+
+[build-dependencies]
+cc = { version = "1", features = ["parallel"] }
+
+[lib]
+name = "p3_poseidon2_cuda"
+path = "src/lib.rs"
+
+[[bench]]
+name = "perm_throughput"
+harness = false
+path = "benches/perm_throughput.rs"

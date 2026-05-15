@@ -20,6 +20,110 @@ unsafe extern "C" {
         out:   *mut u32,
         n:     u64,
     ) -> i32;
+
+    // Session-based API. Opaque handle; caller never derefs it.
+    fn cuda_poseidon2_session_create(out_session: *mut *mut std::ffi::c_void) -> i32;
+    fn cuda_poseidon2_session_destroy(session: *mut std::ffi::c_void) -> i32;
+    fn cuda_poseidon2_session_perm_batch(
+        session: *mut std::ffi::c_void,
+        state:   *const u32,
+        out:     *mut u32,
+        n:       u64,
+    ) -> i32;
+}
+
+/// Persistent GPU buffer + pinned-host staging session.
+///
+/// Use this when you call `permute_batch` more than once: device buffers
+/// and pinned-host staging buffers are allocated once and reused (grown
+/// geometrically as needed). Eliminates per-call `cudaMalloc`/`cudaFree`
+/// and unlocks the pinned-memory PCIe fast path (~2x H<->D bandwidth on
+/// modern systems vs pageable memory).
+///
+/// Single-call usage (the global `permute_batch` function) still works
+/// for one-shot consumers; switch to the session API when the prover
+/// dispatches hashes in a loop.
+pub struct Poseidon2GpuSession {
+    handle: *mut std::ffi::c_void,
+}
+
+// Safety: the underlying C struct is owned by this Rust handle. CUDA
+// resources are thread-affine to the device context; we don't share
+// across threads, but Send is enabled so the session can move between
+// threads if the caller wants.
+unsafe impl Send for Poseidon2GpuSession {}
+
+impl Poseidon2GpuSession {
+    /// Create a new session with zero-capacity buffers. Buffers grow
+    /// lazily on the first `permute_batch` call.
+    pub fn new() -> Self {
+        let mut handle: *mut std::ffi::c_void = std::ptr::null_mut();
+        let rc = unsafe { cuda_poseidon2_session_create(&mut handle) };
+        assert_eq!(rc, 0, "cuda_poseidon2_session_create failed: rc={rc}");
+        assert!(!handle.is_null(), "session_create returned NULL handle");
+        Self { handle }
+    }
+
+    /// Permute `n` BabyBear-16 states using the session's persistent
+    /// buffers. Byte-identical output to `permute_batch` / Plonky3 ref.
+    pub fn permute_batch(&mut self, state: &[BabyBear], out: &mut [BabyBear]) {
+        assert_eq!(state.len(), out.len());
+        assert!(state.len() % 16 == 0, "len must be multiple of 16");
+        let n = (state.len() / 16) as u64;
+        if n == 0 { return; }
+
+        let canon_in: Vec<u32> = state.iter().map(|x| x.as_canonical_u32()).collect();
+        let mut canon_out: Vec<u32> = vec![0; canon_in.len()];
+
+        let rc = unsafe {
+            cuda_poseidon2_session_perm_batch(
+                self.handle,
+                canon_in.as_ptr(),
+                canon_out.as_mut_ptr(),
+                n,
+            )
+        };
+        assert_eq!(rc, 0, "cuda_poseidon2_session_perm_batch failed: rc={rc}");
+
+        for (slot, &x) in out.iter_mut().zip(canon_out.iter()) {
+            *slot = BabyBear::from_int(x);
+        }
+    }
+
+    /// Lower-level: permute on already-canonical u32 inputs, writing
+    /// canonical u32 outputs. Skips Mont<->canonical conversion (the
+    /// caller takes responsibility for the form).
+    pub fn permute_batch_canonical(&mut self, canon_in: &[u32], canon_out: &mut [u32]) -> i32 {
+        assert_eq!(canon_in.len(), canon_out.len());
+        assert!(canon_in.len() % 16 == 0);
+        let n = (canon_in.len() / 16) as u64;
+        if n == 0 { return 0; }
+        unsafe {
+            cuda_poseidon2_session_perm_batch(
+                self.handle,
+                canon_in.as_ptr(),
+                canon_out.as_mut_ptr(),
+                n,
+            )
+        }
+    }
+}
+
+impl Drop for Poseidon2GpuSession {
+    fn drop(&mut self) {
+        if !self.handle.is_null() {
+            let rc = unsafe { cuda_poseidon2_session_destroy(self.handle) };
+            // Don't panic in Drop, just log.
+            if rc != 0 {
+                eprintln!("cuda_poseidon2_session_destroy returned rc={rc}");
+            }
+            self.handle = std::ptr::null_mut();
+        }
+    }
+}
+
+impl Default for Poseidon2GpuSession {
+    fn default() -> Self { Self::new() }
 }
 
 /// Permute `n` BabyBear-16 states in one CUDA dispatch.

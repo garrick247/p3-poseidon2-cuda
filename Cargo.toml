@@ -27,3 +27,8 @@ path = "benches/perm_throughput.rs"
 name = "breakdown"
 harness = false
 path = "benches/breakdown.rs"
+
+[[bench]]
+name = "session"
+harness = false
+path = "benches/session.rs"

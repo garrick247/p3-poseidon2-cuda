@@ -48,6 +48,33 @@ pub fn permute_batch(state: &[BabyBear], out: &mut [BabyBear]) {
     }
 }
 
+/// Phase 1: convert Montgomery-form BabyBear states to canonical u32 limbs.
+/// Exposed so benches can measure the conversion cost in isolation.
+pub fn mont_to_canonical(state: &[BabyBear], canon: &mut [u32]) {
+    assert_eq!(state.len(), canon.len(), "state and canon must match length");
+    for (c, m) in canon.iter_mut().zip(state.iter()) {
+        *c = m.as_canonical_u32();
+    }
+}
+
+/// Phase 2: raw GPU dispatch on canonical-form u32 limbs. Includes H->D copy,
+/// kernel launch, D->H copy, and sync. Returns the kernel's exit code (0 = ok).
+pub fn raw_gpu_call(canon_in: &[u32], canon_out: &mut [u32]) -> i32 {
+    assert_eq!(canon_in.len(), canon_out.len(), "in and out must match length");
+    assert!(canon_in.len() % 16 == 0, "len must be multiple of 16");
+    let n = (canon_in.len() / 16) as u64;
+    if n == 0 { return 0; }
+    unsafe { cuda_poseidon2_bb16_perm_batch(canon_in.as_ptr(), canon_out.as_mut_ptr(), n) }
+}
+
+/// Phase 3: convert canonical u32 limbs back to Montgomery-form BabyBear.
+pub fn canonical_to_mont(canon: &[u32], out: &mut [BabyBear]) {
+    assert_eq!(canon.len(), out.len(), "canon and out must match length");
+    for (slot, &x) in out.iter_mut().zip(canon.iter()) {
+        *slot = BabyBear::from_int(x);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -22,3 +22,8 @@ path = "src/lib.rs"
 name = "perm_throughput"
 harness = false
 path = "benches/perm_throughput.rs"
+
+[[bench]]
+name = "breakdown"
+harness = false
+path = "benches/breakdown.rs"

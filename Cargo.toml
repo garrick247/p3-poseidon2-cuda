@@ -32,3 +32,8 @@ path = "benches/breakdown.rs"
 name = "session"
 harness = false
 path = "benches/session.rs"
+
+[[bench]]
+name = "plonky3_merkle"
+harness = false
+path = "benches/plonky3_merkle.rs"

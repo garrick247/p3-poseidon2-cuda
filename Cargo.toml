@@ -4,15 +4,18 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-p3-baby-bear = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
-p3-field    = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
-p3-symmetric = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+itertools = "0.13"
+thiserror = "2"
+p3-baby-bear   = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-field       = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-symmetric   = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-commit      = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-matrix      = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-util        = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
 
 [dev-dependencies]
 rand = "0.8"
 p3-merkle-tree = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
-p3-matrix      = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
-p3-commit      = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
 
 [build-dependencies]
 cc = { version = "1", features = ["parallel"] }

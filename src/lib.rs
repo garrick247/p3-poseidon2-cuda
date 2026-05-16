@@ -10,6 +10,7 @@
 //! kernel works on canonical-form u32 limbs. We convert at the boundary.
 
 pub mod gpu_merkle;
+pub mod gpu_mmcs;
 
 use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;

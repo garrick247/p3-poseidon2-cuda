@@ -37,3 +37,8 @@ path = "benches/session.rs"
 name = "plonky3_merkle"
 harness = false
 path = "benches/plonky3_merkle.rs"
+
+[[bench]]
+name = "gpu_merkle"
+harness = false
+path = "benches/gpu_merkle.rs"

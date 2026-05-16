@@ -14,8 +14,13 @@ p3-matrix      = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b63801
 p3-util        = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
 
 [dev-dependencies]
-rand = "0.8"
+rand = { version = "0.10", features = ["std_rng"] }
 p3-merkle-tree = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-air         = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-challenger  = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-dft         = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-fri         = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
+p3-uni-stark   = { git = "https://github.com/Plonky3/Plonky3.git", rev = "b638013721b7c9c07b171cb79a47366c928fb550" }
 
 [build-dependencies]
 cc = { version = "1", features = ["parallel"] }
@@ -48,3 +53,9 @@ path = "benches/plonky3_merkle.rs"
 name = "gpu_merkle"
 harness = false
 path = "benches/gpu_merkle.rs"
+
+
+[[bench]]
+name = "fib_prove"
+harness = false
+path = "benches/fib_prove.rs"

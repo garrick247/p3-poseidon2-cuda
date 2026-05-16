@@ -9,6 +9,8 @@
 //! NOTE: Plonky3 stores BabyBear in Montgomery form internally; the GPU
 //! kernel works on canonical-form u32 limbs. We convert at the boundary.
 
+pub mod gpu_merkle;
+
 use p3_baby_bear::BabyBear;
 use p3_field::PrimeField32;
 use p3_field::integers::QuotientMap;
